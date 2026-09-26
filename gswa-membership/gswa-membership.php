@@ -21,7 +21,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-
+require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-signin.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-forgot-password.php';
 add_action( 'admin_menu', 'gswa_membership_admin_menu' );
 
 function gswa_membership_admin_menu() {
@@ -161,9 +162,20 @@ if ( empty( $first_name ) ||
 if ( ! is_wp_error( $user_id ) ) {
 
     update_user_meta( $user_id, 'gswa_mobile', $mobile );
+    //adding for redirecting test
+    wp_safe_redirect(
+        add_query_arg(
+            'registered',
+            '1',
+            site_url( '/sign-in/' )
+        )
+    );
+    exit;
+    //adding end
 
-    echo '<p>Registration successful!</p>';
-    echo '<p>Your GSWA website account has been created.</p>';
+    //echo '<p>Registration successful!</p>';
+    //echo '<p>Your GSWA website account has been created.</p>';
+    
 }else{
     echo '<p>Unable to create your account. Please try again.</p>';
 }
