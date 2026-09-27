@@ -21,6 +21,25 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+
+//<?php
+// 1. ALWAYS start the session at the very top of the file
+session_start();
+
+// ... Your database insertion logic happens here ...
+
+if ($signup_successful) {
+    // 2. Store the submitted email in a session variable
+    $_SESSION['flash_email'] = $_POST['email']; 
+
+    // 3. Redirect to your sign-in page with just the standard flag
+    header("Location: http://gswajune20.local");
+    exit;
+}
+
+
+//adding above code for auto email on signin page
+
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-signin.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-forgot-password.php';
 add_action( 'admin_menu', 'gswa_membership_admin_menu' );
@@ -69,6 +88,8 @@ function gswa_validate_mobile( $mobile ) {
 
     return (bool) preg_match( '/^01[3-9]\d{8}$/', $mobile );
 }
+
+
 
 function gswa_membership_signup_form() {
 
@@ -122,6 +143,14 @@ if ( empty( $first_name ) ||
 
     echo '<p>Please complete all required fields.</p>';
 
+   } elseif ( ! preg_match( "/^[A-Za-z\s'-]+$/", $first_name ) ) {
+
+    echo '<p>First Name must contain English letters only.</p>';
+
+} elseif ( ! preg_match( "/^[A-Za-z\s'-]+$/", $last_name ) ) {
+
+    echo '<p>Last Name must contain English letters only.</p>';
+
 } elseif ( ! is_email( $email ) ) {
 
     echo '<p>Please enter a valid email address.</p>';
@@ -159,22 +188,52 @@ if ( empty( $first_name ) ||
 
 
 
-if ( ! is_wp_error( $user_id ) ) {
 
-    update_user_meta( $user_id, 'gswa_mobile', $mobile );
-    //adding for redirecting test
-    wp_safe_redirect(
-        add_query_arg(
-            'registered',
-            '1',
-            site_url( '/sign-in/' )
-        )
+    //adding signin_token
+    if ( ! is_wp_error( $user_id ) ) {
+
+    update_user_meta(
+        $user_id,
+        'gswa_mobile',
+        $mobile
     );
+
+    /*
+     * Store the newly registered email temporarily.
+     * The email will NOT appear in the URL.
+     */
+
+    $signin_token = wp_generate_password(
+        32,
+        false,
+        false
+    );
+
+    set_transient(
+        'gswa_signin_' . $signin_token,
+        $email,
+        10 * MINUTE_IN_SECONDS
+    );
+
+    /*
+     * Redirect to the GSWA Sign In page.
+     * Only the temporary token appears in the URL.
+     */
+
+    $signin_url = add_query_arg(
+        array(
+            'registered'   => '1',
+            'signin_token' => $signin_token,
+        ),
+        home_url( '/sign-in/' )
+    );
+
+    wp_safe_redirect( $signin_url );
     exit;
+
     //adding end
 
-    //echo '<p>Registration successful!</p>';
-    //echo '<p>Your GSWA website account has been created.</p>';
+    
     
 }else{
     echo '<p>Unable to create your account. Please try again.</p>';
@@ -191,7 +250,7 @@ if ( ! is_wp_error( $user_id ) ) {
        echo '<p>Mobileno: ' . esc_html( $mobile ) . '</p>';
        */
 
-    
+ 
     }
     // 2. Render the Form HTML (Inside the buffer)
     ?>
@@ -205,12 +264,13 @@ if ( ! is_wp_error( $user_id ) ) {
 <?php wp_nonce_field( 'gswa_signup_action', 'gswa_signup_nonce' ); ?>
             <p>
                 <label for="gswa_first_name">First Name</label><br>
-                <input type="text" name="gswa_first_name" required>
+                <!--<input type="text" name="gswa_first_name"  required>-->
+                <input type="text" name="gswa_first_name" pattern="[A-Za-z\s'-]+" title="Please enter English letters only." required>
             </p>
 
             <p>
                 <label for="gswa_last_name">Last Name</label><br>
-                <input type="text" name="gswa_last_name" required>
+                <input type="text" name="gswa_last_name" pattern="[A-Za-z\s'-]+" title="Please enter English letters only." required>
             </p>
 
             <p>
