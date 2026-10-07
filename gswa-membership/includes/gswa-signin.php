@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_shortcode( 'gswa_signin', 'gswa_membership_signin_form' );
 
 
+
 function gswa_membership_signin_form() {
 
     ob_start();

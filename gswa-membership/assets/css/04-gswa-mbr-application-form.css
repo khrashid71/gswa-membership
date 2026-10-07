@@ -1,0 +1,11 @@
+fieldset {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+legend {
+    font-weight: bold;
+    padding: 0 10px;
+    color: #2e7d32; /* GSWA Green */
+}

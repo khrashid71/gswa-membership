@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!/^[A-Za-z\s'-]+$/.test(this.value)) {
                 this.setCustomValidity(
-                    'Please enter English letters only.'
+                    'Please enter English Bangla letters only.'
                 );
             } else {
                 this.setCustomValidity('');

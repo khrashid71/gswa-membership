@@ -22,26 +22,16 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-//<?php
-// 1. ALWAYS start the session at the very top of the file
-session_start();
-
-// ... Your database insertion logic happens here ...
-
-if ($signup_successful) {
-    // 2. Store the submitted email in a session variable
-    $_SESSION['flash_email'] = $_POST['email']; 
-
-    // 3. Redirect to your sign-in page with just the standard flag
-    header("Location: http://gswajune20.local");
-    exit;
-}
-
+// Helpers
+require_once plugin_dir_path( __FILE__ ) . 'includes/helpers.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/enqueue.php';
 
 //adding above code for auto email on signin page
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-signin.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-forgot-password.php';
+// ADD THIS LINE to load the new membership application code:
+require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-mbr-application.php';
 add_action( 'admin_menu', 'gswa_membership_admin_menu' );
 
 function gswa_membership_admin_menu() {

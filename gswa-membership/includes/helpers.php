@@ -8,13 +8,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Write message to PHP error log -helper.php
  */
-function gswa_log( $message ) {
+function gswa_membership_log( $message ) {
 
     if ( is_array( $message ) || is_object( $message ) ) {
         $message = print_r( $message, true );
     }
 
-    error_log( '[GSWA] ' . $message );
+    error_log( '[GSWA-Mebership] ' . $message );
 
     
 }
