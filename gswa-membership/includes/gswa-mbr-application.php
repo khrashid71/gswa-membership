@@ -11,11 +11,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_shortcode( 'gswa_member_application', 'gswa_member_application_form' );
 
 //Mobile validation
-function applicant_validate_mobile( $mobile ) {
 
-    return (bool) preg_match( '/^01[3-9]\d{8}$/', $mobile );
+    function gswa_validate_international_mobile( $mobile ) {
 
-    
+    $mobile = trim( $mobile );
+
+    // Require + followed by 2–15 digits.
+    return (bool) preg_match(
+        '/^\+[1-9]\d{1,14}$/',
+        $mobile
+    );
 }
 //Tetsing mobile end
 function gswa_member_application_form() {
@@ -163,8 +168,16 @@ function gswa_member_application_form() {
      <fieldset>
             <legend>Contact Information</legend>
       <div class="form-group">
-        <label for="phone">Mobile Number:</label>
-        <input type="tel" id="phone" name="phone" pattern="01[3-9][0-9]{8}" placeholder="01XXXXXXXXX" required>
+       <label for="mobile">Mobile Number</label>
+        <input
+            type="tel"
+            id="mobile"
+            name="mobile"
+            placeholder="+880 1712 345678"
+            autocomplete="tel"
+            required
+    >
+    <small>Include your country calling code, starting with +.</small>
     </div>
         <div class="form-group">
 
@@ -249,9 +262,24 @@ function gswa_process_member_application() {
         $_POST['blood_group'] ?? ''
     );
 
-    $mobile = sanitize_text_field(
+    /*$mobile = sanitize_text_field(
          $_POST['phone'] ?? '' 
+    );*/
+   // retrieves the submitted phone number and sanitizes it before validation.
+    /*$mobile = isset( $_POST['mobile'] )
+    ? sanitize_text_field( wp_unslash( $_POST['mobile'] ) )
+    : '';*/
+// this is alternate using explicit if
+    $mobile = '';
+
+if (
+    isset( $_POST['mobile'] ) &&
+    is_string( $_POST['mobile'] )
+) {
+    $mobile = sanitize_text_field(
+        wp_unslash( $_POST['mobile'] )
     );
+}
 
     $email = sanitize_text_field(
          $_POST['email'] ?? '' 
@@ -259,7 +287,15 @@ function gswa_process_member_application() {
 
    //=================Validating======================
 
+echo '<pre>';
 
+var_dump( $applicant_name );
+var_dump( $father_name );
+var_dump( $mother_name );
+var_dump( $mobile );
+var_dump( $email );
+
+echo '</pre>';
 // Validate required fields-added mobile
 if ( empty( $applicant_name ) ||
      empty( $father_name ) || 
@@ -293,13 +329,19 @@ if ( ! is_email( $email ) ) {
 
     wp_die ('Please enter a valid email address.');
 
-//validation mobileno
+
 } 
- if ( ! applicant_validate_mobile( $mobile ) ) {
 
-    wp_die('Please enter a valid Bangladesh mobile number.');
+//validation mobileno
+$mobile = preg_replace( '/[\s().-]+/', '', $mobile );
+if ( ! gswa_validate_international_mobile ( $mobile ) ) {
 
- }
+    wp_die(
+        'Please enter a valid international mobile number, '
+        . 'including your country calling code, e.g. +8801712345678.'
+    );
+
+}
 
 
 
