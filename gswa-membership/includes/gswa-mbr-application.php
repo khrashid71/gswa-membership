@@ -10,18 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 add_shortcode( 'gswa_member_application', 'gswa_member_application_form' );
 
-//Mobile validation
 
-    function gswa_validate_international_mobile( $mobile ) {
-
-    $mobile = trim( $mobile );
-
-    // Require + followed by 2–15 digits.
-    return (bool) preg_match(
-        '/^\+[1-9]\d{1,14}$/',
-        $mobile
-    );
-}
 //Tetsing mobile end
 function gswa_member_application_form() {
 
@@ -109,17 +98,26 @@ function gswa_member_application_form() {
             <!--NID-->
             
         <label for="nid">National ID (NID) Number:</label>
-        <input type="text" id="nid" name="nid" pattern="[0-9]{10,17}" placeholder="10 or 17 digit number" required>
+         <input 
+            type="text"
+            id="nid"
+            name="nid"
+            pattern="([0-9]{10}|[0-9]{17})"
+            inputmode="numeric"
+            maxlength="17"
+            placeholder="Enter your 10 or 17 digit NID number"
+            required>
+        <!-- NID Image: 100 KB–500 KB -->
         <label for="nid_photo">Upload NID photo:</label>
-        <input type="file" id="photo_nid" name="photo_nid" accept="image/*" required>
+        <input type="file" id="nid_photo" name="nid_photo" accept=".jpg,.jpeg,.png,.webp" required>
 </div> 
 
 <div class="form-group">
 
          
         <label for="applicant_photo"> Passport Size Photo:</label>
-         
-        <input type="file" id="photo" name="photo" accept="image/*" required>
+         <!-- PP size photo Image: 20 KB–300 KB -->
+        <input type="file" id="pp_photo" name="pp_photo" accept=".jpg,.jpeg,.png,.webp" required>
     
 </div>
         <div class="form-group">
@@ -215,146 +213,4 @@ function gswa_member_application_form() {
 /**
  * Process application form
  */
-add_action( 'init', 'gswa_process_member_application' );
 
-function gswa_process_member_application() {
-
-    if ( ! isset( $_POST['gswa_application_submit'] ) ) {
-        return;
-    }
-
-    //=======adding nonce=========
-     if (
-        ! isset( $_POST['gswa_application_nonce'] ) ||
-        ! wp_verify_nonce(
-            sanitize_text_field( wp_unslash( $_POST['gswa_application_nonce'] ) ),
-            'gswa_application_action'
-        )
-    ) {
-        wp_die( 'Security verification failed. Please refresh the page and try again.' );
-    }
-    //end nonce
-   //==========Sanitize===============
-    $applicant_name = sanitize_text_field(
-        $_POST['applicant_full_name'] ?? ''
-    );
-    
-
-    $father_name = sanitize_text_field(
-        $_POST['father_full_name'] ?? ''
-    );
-
-
-    $mother_name = sanitize_text_field(
-        $_POST['mother_full_name'] ?? ''
-    );
-
-    $date_of_birth= sanitize_text_field(
-        $_POST['birthday'] ?? ''
-    );
-
-        
-    $national_id= sanitize_text_field(
-        $_POST['nid'] ?? ''
-    );
-
-    $blood_group = sanitize_text_field(
-        $_POST['blood_group'] ?? ''
-    );
-
-    /*$mobile = sanitize_text_field(
-         $_POST['phone'] ?? '' 
-    );*/
-   // retrieves the submitted phone number and sanitizes it before validation.
-    /*$mobile = isset( $_POST['mobile'] )
-    ? sanitize_text_field( wp_unslash( $_POST['mobile'] ) )
-    : '';*/
-// this is alternate using explicit if
-    $mobile = '';
-
-if (
-    isset( $_POST['mobile'] ) &&
-    is_string( $_POST['mobile'] )
-) {
-    $mobile = sanitize_text_field(
-        wp_unslash( $_POST['mobile'] )
-    );
-}
-
-    $email = sanitize_text_field(
-         $_POST['email'] ?? '' 
-    );
-
-   //=================Validating======================
-
-echo '<pre>';
-
-var_dump( $applicant_name );
-var_dump( $father_name );
-var_dump( $mother_name );
-var_dump( $mobile );
-var_dump( $email );
-
-echo '</pre>';
-// Validate required fields-added mobile
-if ( empty( $applicant_name ) ||
-     empty( $father_name ) || 
-     empty($mother_name)||
-     empty( $mobile )||
-     empty($email)){
-     
-
-    echo '<p>Please complete all required fields.</p>';
-
-   } 
-   
-   if ( ! preg_match( "/^[A-Za-z\s'-]+$/", $applicant_name ) ) {
-
-    wp_die( 'Applicant Name must contain English letters only.' );
-
-  } 
-  if ( ! preg_match( "/^[A-Za-z\s'-]+$/", $father_name) ) {
-
-   wp_die('Father Name must contain English letters only.');
-
-}
-
-  if ( ! preg_match( "/^[A-Za-z\s'-]+$/", $mother_name) ) {
-
-    wp_die( 'Mother Name must contain English letters only.');
-
-} 
-
-if ( ! is_email( $email ) ) {
-
-    wp_die ('Please enter a valid email address.');
-
-
-} 
-
-//validation mobileno
-$mobile = preg_replace( '/[\s().-]+/', '', $mobile );
-if ( ! gswa_validate_international_mobile ( $mobile ) ) {
-
-    wp_die(
-        'Please enter a valid international mobile number, '
-        . 'including your country calling code, e.g. +8801712345678.'
-    );
-
-}
-
-
-
-//==============================================
-
-
-
-    // Temporary testing
-    
-    error_log( 'Applicant Name: ' . $applicant_name );
-    error_log( 'Father Name: ' . $father_name );
-    error_log( 'Mother Name: ' . $mother_name );
-    error_log( 'Date of Birth: ' . $date_of_birth );
-    error_log( 'NID: ' . $national_id );
-    error_log( 'Blood Group: ' . $blood_group );
-}

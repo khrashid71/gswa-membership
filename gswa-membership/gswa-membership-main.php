@@ -31,7 +31,11 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/enqueue.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-signin.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-forgot-password.php';
 // ADD THIS LINE to load the new membership application code:
+
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-mbr-application.php';
+//membership form validation
+require_once plugin_dir_path( __FILE__ ). 'includes/membership-form-validation.php';
+
 add_action( 'admin_menu', 'gswa_membership_admin_menu' );
 
 function gswa_membership_admin_menu() {
