@@ -17,7 +17,7 @@ function gswa_member_application_form() {
     ob_start();
     ?>
 
-    <form method="post" enctype="multipart/form-data">
+    <form id="gswa-membership-application" method="post" enctype="multipart/form-data">
         <h2>Gopalganj Social Welfare Association (GSWA)</h2>
     <p>Membership Application Form</p>
          <?php wp_nonce_field( 'gswa_application_action', 'gswa_application_nonce' ); ?>
@@ -115,7 +115,7 @@ function gswa_member_application_form() {
 <div class="form-group">
 
          
-        <label for="applicant_photo"> Passport Size Photo:</label>
+        <label for="pp_photo"> Passport Size Photo:</label>
          <!-- PP size photo Image: 20 KB–300 KB -->
         <input type="file" id="pp_photo" name="pp_photo" accept=".jpg,.jpeg,.png,.webp" required>
     
@@ -149,12 +149,12 @@ function gswa_member_application_form() {
       
        <div class="form-group">
             <!--Education-->
-            <label for="education_level">Education:</label>
+            <label for="mbr_education">Education:</label>
             <input type="text" id="mbr_education" name="mbr_education" required>
 </div>
 <div class="form-group">
             <!--Profession-->
-            <label for="profession-occupation">Profession:</label>
+            <label for="mbr_profession">Profession:</label>
             <input type="text" id="mbr_profession" name="mbr_profession" required>
 </div>
 
