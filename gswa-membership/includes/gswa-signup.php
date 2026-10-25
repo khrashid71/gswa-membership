@@ -10,12 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 add_shortcode( 'gswa_signup', 'gswa_membership_signup_form' );
-//Mobile validation
-function gswa_validate_mobile( $mobile ) {
-
-    return (bool) preg_match( '/^01[3-9]\d{8}$/', $mobile );
-}
-
 
 
 function gswa_membership_signup_form() {
@@ -85,7 +79,7 @@ if ( empty( $first_name ) ||
 //validation mobileno
 } elseif ( ! gswa_validate_mobile( $mobile ) ) {
 
-    echo '<p>Please enter a valid Bangladesh mobile number.</p>';
+    echo '<p>Please enter a valid  mobile number with or without country code.</p>';
 
  }elseif ( email_exists( $email ) ) {
 

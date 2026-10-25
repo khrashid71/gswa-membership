@@ -1,5 +1,5 @@
 <?php
-function gswa_validate_international_mobile( $mobile ) {
+/*function gswa_validate_international_mobile( $mobile ) {
 
     $mobile = trim( $mobile );
 
@@ -7,6 +7,26 @@ function gswa_validate_international_mobile( $mobile ) {
         '/^\+[1-9]\d{1,14}$/',
         $mobile
     );
+
+    
+}*/
+
+function gswa_validate_mobile( $mobile ) {
+
+    $mobile = trim( $mobile );
+
+    // Bangladesh domestic format: 01XXXXXXXXX
+    if ( preg_match( '/^01[3-9]\d{8}$/', $mobile ) ) {
+        return true;
+    }
+
+    // International format: + followed by 1–15 digits,
+    // with the first digit after + being nonzero.
+    if ( preg_match( '/^\+[1-9]\d{1,14}$/', $mobile ) ) {
+        return true;
+    }
+
+    return false;
 }
 function gswa_process_member_application() {
     if ( ! isset( $_POST['gswa_application_submit'] ) ) {
@@ -51,10 +71,10 @@ function gswa_process_member_application() {
     if ( ! is_email( $email ) ) {
         wp_die( 'Please enter a valid email address.' );
     }
-
-    //$mobile = preg_replace( '/[\s().-]+/', '', $mobile );
-    if ( ! gswa_validate_international_mobile( $mobile ) ) {
-        wp_die( 'Please enter a valid international mobile number, including your country calling code, e.g. +8801712345678.' );
+  
+    
+        if ( ! gswa_validate_mobile( $mobile ) ) {
+        wp_die( 'Please enter a valid Bangladesh domestic or international mobile number.' );
     }
     
     if ( ! preg_match( '/^(?:[0-9]{10}|[0-9]{17})$/', $national_id ) ) {

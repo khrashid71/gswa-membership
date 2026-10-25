@@ -171,11 +171,11 @@ function gswa_member_application_form() {
             type="tel"
             id="mobile"
             name="mobile"
-            placeholder="+880 1712 345678"
+            placeholder="11 or 14 digit"
             autocomplete="tel"
             required
     >
-    <small>Include your country calling code, starting with +.</small>
+    <small>county code with or without only valid</small>
     </div>
         <div class="form-group">
 
