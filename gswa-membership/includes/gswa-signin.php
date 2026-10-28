@@ -18,9 +18,9 @@ function gswa_membership_signin_form() {
 
     /*
      * Default:
-     * Normal visitor → email field remains blank.
+     * Normal visitor → login field remains blank.
      */
-    $email = '';
+    $login_identifier = '';
 
     /*
      * If user has just completed registration,
@@ -42,7 +42,7 @@ function gswa_membership_signin_form() {
 
         if ( false !== $stored_email ) {
 
-            $email = sanitize_email( $stored_email );
+            $login_identifier = sanitize_email( $stored_email );
 
             /*
              * This is a one-time handoff.
@@ -92,80 +92,121 @@ function gswa_membership_signin_form() {
 
 
         /*
-         * Get submitted email.
+         * Get submitted email or mobile number.
          */
-        $email = sanitize_email(
-            wp_unslash(
-                $_POST['gswa_email'] ?? ''
+        
+ $login_identifier = sanitize_text_field(
+    wp_unslash(
+        $_POST['gswa_login'] ?? ''
+    )
+);
+
+/*
+ * Get submitted password.
+ *
+ * Do NOT sanitize the password.
+ */
+$password = $_POST['gswa_password'] ?? '';
+
+/*
+ * Validate required fields.
+ */
+if ( empty( $login_identifier ) || empty( $password ) ) {
+
+    echo '<p class="gswa-error">';
+    echo 'Please enter your email or mobile number and password.';
+    echo '</p>';
+
+} else {
+
+    /*
+     * Determine whether the identifier is an email
+     * or a mobile number.
+     */
+    if ( is_email( $login_identifier ) ) {
+
+        /*
+         * Email login:
+         * The current registration code uses email
+         * as the WordPress username.
+         */
+        $user = get_user_by(
+            'email',
+            $login_identifier
+        );
+
+    } else {
+
+        /*
+         * Mobile login:
+         * Find the WordPress user whose gswa_mobile
+         * user meta matches the submitted number.
+         */
+        $users = get_users(
+            array(
+                'meta_key'   => 'gswa_mobile',
+                'meta_value' => $login_identifier,
+                'number'     => 2,
+                'fields'     => 'all',
             )
         );
 
+        /*
+         * Accept the mobile number only if exactly
+         * one matching account is found.
+         */
+        $user = ( 1 === count( $users ) )
+            ? $users[0]
+            : false;
+    }
+
+    /*
+     * Authenticate using the identified WordPress
+     * username and the submitted password.
+     */
+    if ( ! $user ) {
+
+        echo '<p class="gswa-error">';
+        echo 'Invalid email/mobile number or password. Please try again.';
+        echo '</p>';
+
+    } else {
+
+        $authenticated_user = wp_signon(
+            array(
+                'user_login'    => $user->user_login,
+                'user_password' => $password,
+                'remember'      => false,
+            ),
+            is_ssl()
+        );
 
         /*
-         * Get submitted password.
-         *
-         * Do NOT sanitize the password.
-         * Passwords can legally contain special characters.
+         * Check authentication result.
          */
-        $password = $_POST['gswa_password'] ?? '';
-
-
-        /*
-         * Validate required fields.
-         */
-        if ( empty( $email ) || empty( $password ) ) {
+        if ( is_wp_error( $authenticated_user ) ) {
 
             echo '<p class="gswa-error">';
-            echo 'Please enter your email and password.';
-            echo '</p>';
-
-        } elseif ( ! is_email( $email ) ) {
-
-            echo '<p class="gswa-error">';
-            echo 'Please enter a valid email address.';
+            echo 'Invalid email/mobile number or password. Please try again.';
             echo '</p>';
 
         } else {
 
             /*
-             * Authenticate the WordPress user.
+             * Sign In successful.
+             * Redirect to GSWA Member Application.
              */
-            $user = wp_signon(
-                array(
-                    'user_login'    => $email,
-                    'user_password' => $password,
-                    'remember'      => false,
-                ),
-                is_ssl()
+            wp_safe_redirect(
+                home_url( '/member-application/' )
             );
 
+            exit;
+        } // Close Sign In Successful
+    } //Close authenticated_user = wp_signon
+ } //Close Determine whether the identifier is an email
+   //or a mobile number.
 
-            /*
-             * Check authentication result.
-             */
-            if ( is_wp_error( $user ) ) {
-
-                echo '<p class="gswa-error">';
-                echo 'Invalid email or password. Please try again.';
-                echo '</p>';
-
-            } else {
-
-                /*
-                 * Sign In successful.
-                 *
-                 * Redirect to GSWA Member Application.
-                 */
-                $application_url = home_url(
-                    '/member-application/'
-                );
-
-                wp_safe_redirect( $application_url );
-                exit;
-            }
-        }
-    }
-
+} //Close POST SERVER REQUEST_METHOD
     ?>
 
     <div class="gswa-membership-signin">
@@ -182,17 +223,17 @@ function gswa_membership_signin_form() {
             ?>
 
             <p>
-                <label for="gswa_email">
-                    Email
+                <label for="gswa_login">
+                    Email or Mobile Number
                 </label><br>
 
                 <input
-                    type="email"
-                    id="gswa_email"
-                    name="gswa_email"
-                    value="<?php echo esc_attr( $email ); ?>"
+                    type="text"
+                    id="gswa_login"
+                    name="gswa_login"
+                    value="<?php echo esc_attr( $login_identifier ?? '' ); ?>"
                     autocomplete="username"
-                    required
+                    requireds
                 >
             </p>
 

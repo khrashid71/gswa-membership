@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Create a custom hook gswa_signup
  */
 
+
 add_shortcode( 'gswa_signup', 'gswa_membership_signup_form' );
 
 
@@ -85,7 +86,11 @@ if ( empty( $first_name ) ||
 
     echo '<p>This email address is already registered.</p>';
 
-} elseif ( $password !== $confirm_password ) {
+}elseif ( gswa_mobile_exists( $mobile ) ) { 
+            // New uniqueness validation block
+            echo '<p>This mobile number is already registered.</p>';
+
+}elseif ( $password !== $confirm_password ) {
 
     echo '<p>Passwords do not match.</p>';
 
@@ -113,11 +118,17 @@ if ( empty( $first_name ) ||
     //adding signin_token
     if ( ! is_wp_error( $user_id ) ) {
 
-    update_user_meta(
-        $user_id,
-        'gswa_mobile',
-        $mobile
-    );
+   
+    $mobile_saved = update_user_meta(
+    $user_id,
+    'gswa_mobile',
+    $mobile
+);
+
+error_log(
+    'GSWA mobile metadata saved: ' .
+    ( false !== $mobile_saved ? 'YES' : 'NO' )
+);
 
     /*
      * Store the newly registered email temporarily.

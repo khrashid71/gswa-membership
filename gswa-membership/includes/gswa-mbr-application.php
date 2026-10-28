@@ -159,8 +159,6 @@ function gswa_member_application_form() {
 </div>
 
            
-
-        
     </fieldset>
 
      <fieldset>
