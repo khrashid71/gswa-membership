@@ -233,7 +233,7 @@ if ( empty( $login_identifier ) || empty( $password ) ) {
                     name="gswa_login"
                     value="<?php echo esc_attr( $login_identifier ?? '' ); ?>"
                     autocomplete="username"
-                    requireds
+                    required
                 >
             </p>
 

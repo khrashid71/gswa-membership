@@ -15,6 +15,25 @@ add_shortcode( 'gswa_member_application', 'gswa_member_application_form' );
 function gswa_member_application_form() {
 
     ob_start();
+
+            // Ensure applicant is logged in.
+        if ( ! is_user_logged_in() ) {
+
+            return '<p>Please sign in before submitting your application.</p>';
+        }
+
+        // Retrieve logged-in WordPress user.
+        $current_user = wp_get_current_user();
+
+        // Registered email.
+        $registered_email = $current_user->user_email;
+
+        // Registered mobile.
+        $registered_mobile = get_user_meta(
+            $current_user->ID,
+            'gswa_mobile',
+            true
+        );
     ?>
 
     <form id="gswa-membership-application" method="post" enctype="multipart/form-data" novalidate>
@@ -183,8 +202,8 @@ function gswa_member_application_form() {
             type="tel"
             id="mobile"
             name="mobile"
-            placeholder="11 or 14 digit"
-            autocomplete="tel"
+            value="<?php echo esc_attr( $registered_mobile ); ?>"
+            readonly
             required
     >
     <small>county code with or without only valid</small>
@@ -192,7 +211,12 @@ function gswa_member_application_form() {
         <div class="form-group">
 
            <label for="email">Email Address:</label>
-        <input type="email" id="email" name="email" placeholder="example@mail.com" required>
+        <input type="email" 
+        id="email" 
+        name="email" 
+        value="<?php echo esc_attr( $registered_email ); ?>"
+        readonly
+        required>
 </div>
         
     </fieldset>
