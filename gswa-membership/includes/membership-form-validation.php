@@ -11,7 +11,7 @@
     
 }*/
 
-function gswa_validate_mobile( $mobile ) {
+/*function gswa_validate_mobile( $mobile ) {
 
     $mobile = trim( $mobile );
 
@@ -27,7 +27,21 @@ function gswa_validate_mobile( $mobile ) {
     }
 
     return false;
+}*/
+
+function gswa_validate_mobile( $mobile ) {
+    // 1. Sanitize input: Strip out spaces, hyphens, parentheses, and dots
+    $normalizedMobile = preg_replace('/[\s\-().]/', '', $mobile);
+
+    // 2. Validate: Allows optional '+', followed by ANY digit (0-9),
+    // with a total length between 7 and 15 digits.
+    if ( preg_match( '/^\+?[0-9]\d{6,14}$/', $normalizedMobile ) ) {
+        return true;
+    }
+
+    return false;
 }
+
 function gswa_process_member_application() {
     if ( ! isset( $_POST['gswa_application_submit'] ) ) {
         return;
@@ -37,7 +51,14 @@ function gswa_process_member_application() {
     if ( ! isset( $_POST['gswa_application_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['gswa_application_nonce'] ) ), 'gswa_application_action' ) ) {
         wp_die( 'Security verification failed. Please refresh the page and try again.' );
     }
+    
+    // Sanitize dropdown lists
 
+    $eligibility    = sanitize_text_field( wp_unslash( $_POST['eligibility'] ?? '' ) );
+    $naitve_upazila = sanitize_text_field( wp_unslash( $_POST['native_upazila'] ?? '' ) );
+    $member_type    = sanitize_text_field( wp_unslash( $_POST['memberType'] ?? '' ) );
+
+    
     // Sanitize input text fields
     $applicant_name = sanitize_text_field( $_POST['applicant_full_name'] ?? '' );
     $father_name    = sanitize_text_field( $_POST['father_full_name'] ?? '' );

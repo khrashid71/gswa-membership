@@ -27,6 +27,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once plugin_dir_path( __FILE__ ) . 'includes/helpers.php';
 // Centralized CSS and JavaScript enqueue
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-central-enqueue.php';
+//creating  database table for membership
+require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-database.php';
 //Adding signup page
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-signup.php';
 //adding above code for auto email on signin page
@@ -36,6 +38,7 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-forgot-password.php';
 // ADD THIS LINE to load the new membership application code:
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-mbr-application.php';
+
 //membership form validation
 require_once plugin_dir_path( __FILE__ ). 'includes/membership-form-validation.php';
 

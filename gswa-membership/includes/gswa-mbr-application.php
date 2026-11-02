@@ -17,16 +17,16 @@ function gswa_member_application_form() {
     ob_start();
     ?>
 
-    <form id="gswa-membership-application" method="post" enctype="multipart/form-data">
+    <form id="gswa-membership-application" method="post" enctype="multipart/form-data" novalidate>
         <h2>Gopalganj Social Welfare Association (GSWA)</h2>
     <p>Membership Application Form</p>
          <?php wp_nonce_field( 'gswa_application_action', 'gswa_application_nonce' ); ?>
         <fieldset>
-            <legend>Eligibility & Membership Type</legend>
+            <legend>Eligibility, Native Upazila & Membership Type</legend>
 
             <!-- Gopalganj Eligibility Check -->
     <div class="form-group">
-        <label for="eligibility">Eligibility:</label>
+        <label for="eligibility">eligibility:</label>
         <select id="eligibility" name="eligibility" required>
             <option value="" disabled selected>Select how you qualify</option>
             <option value="resident">I am a permanent resident of Gopalganj</option>
@@ -34,6 +34,20 @@ function gswa_member_application_form() {
             <option value="living">I am living in Gopalganj for 3 years</option>
             <option value="styding">I am studying in Gopalganj</option>
             <option value="donor">other - want to become donor member</option>
+            
+        </select>
+    </div>
+    <!-- Select Native Upazila  -->
+    <div class="form-group">
+        <label for="native_upazila">Select Upazila:</label>
+        <select id="native_upazila" name="native_upazila" required>
+            <option value="" disabled selected>Select native upazila</option>
+            <option value="gopalganj">Gopalganj Sadar</option>
+            <option value="muksudpur">Muksudpur</option>
+            <option value="kashiani">Kashiani</option>
+            <option value="kotalipara">Kotalipara</option>
+            <option value="tungipara">Tungipara</option>
+            <option value="other">Other - can apply DM or VM</option>
             
         </select>
     </div>
@@ -123,7 +137,7 @@ function gswa_member_application_form() {
         <div class="form-group">
             <!--Blood Group-->
             <label for="blood_group">Blood group:</label>
-            <input type="text" id="blood_group" name="blood_group">
+            <input type="text" id="blood_group" name="blood_group" placeholder="Enter your Blood Group">
 </div>
     </fieldset>
 
