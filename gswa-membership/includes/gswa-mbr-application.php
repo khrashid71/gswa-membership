@@ -141,8 +141,8 @@ function gswa_member_application_form() {
             placeholder="Enter your 10 or 17 digit NID number"
             required>
         <!-- NID Image: 100 KB–500 KB -->
-        <label for="nid_photo">Upload NID photo:</label>
-        <input type="file" id="nid_photo" name="nid_photo" accept=".jpg,.jpeg,.png,.webp" required>
+        <!--<label for="nid_photo">Upload NID photo:</label>
+        <input type="file" id="nid_photo" name="nid_photo" accept=".jpg,.jpeg,.png,.webp" required>-->
 </div> 
 
 <div class="form-group">

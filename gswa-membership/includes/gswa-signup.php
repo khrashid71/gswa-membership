@@ -61,7 +61,8 @@ if ( empty( $first_name ) ||
      empty( $last_name ) || 
      empty( $email )||
      empty($mobile) || 
-     empty( $password ) ) {
+     empty($password)||
+     empty( $confirm_password ) ) {
 
     echo '<p>Please complete all required fields.</p>';
 
@@ -77,7 +78,7 @@ if ( empty( $first_name ) ||
 
     echo '<p>Please enter a valid email address.</p>';
 
-//validation mobileno
+//validation mobileno ref: membership-form-validation.php
 } elseif ( ! gswa_validate_mobile( $mobile ) ) {
 
     echo '<p>Please enter a valid  mobile number with or without country code.</p>';
@@ -191,38 +192,38 @@ error_log(
 
         <h3>GSWA Membership Sign Up</h3>
 
-        <form method="post" action="">
+        <form id="gswa-signup"  method="post" action="" novalidate>
             <!-- Correct implementation of the WP Nonce field -->
 <?php wp_nonce_field( 'gswa_signup_action', 'gswa_signup_nonce' ); ?>
             <p>
                 <label for="gswa_first_name">First Name</label><br>
                 <!--<input type="text" name="gswa_first_name"  required>-->
-                <input type="text" name="gswa_first_name" pattern="[A-Za-z\s'-]+" title="Please enter English letters only." required>
+                <input type="text" id="gswa_first_name" name="gswa_first_name" pattern="[A-Za-z\s'-]+" title="Please enter English letters only."   required>
             </p>
 
             <p>
                 <label for="gswa_last_name">Last Name</label><br>
-                <input type="text" name="gswa_last_name" pattern="[A-Za-z\s'-]+" title="Please enter English letters only." required>
+                <input type="text" id="gswa_last_name" name="gswa_last_name" pattern="[A-Za-z\s'-]+" title="Please enter English letters only."    required>
             </p>
 
             <p>
                 <label for="gswa_email">Email</label><br>
-                <input type="email" name="gswa_email" required>
+                <input type="email" id="gswa_email" name="gswa_email" required>
             </p>
             <p>
                 <!-- Added Mobileno-->
-                <label for="user_mobile">Mobileno</label><br>
-                <input type="tel" name="phone" required>
+                <label for="phone">Mobileno</label><br>
+                <input type="tel" id="phone" name="phone" required>
             </p>
 
             <p>
                 <label for="gswa_password">Password</label><br>
-                <input type="password" name="gswa_password" required>
+                <input type="password" id="gswa_password" name="gswa_password" required>
             </p>
 
             <p>
                 <label for="gswa_confirm_password">Confirm Password</label><br>
-                <input type="password" name="gswa_confirm_password" required>
+                <input type="password" id="gswa_confirm_password" name="gswa_confirm_password" required>
             </p>
 
             <p>

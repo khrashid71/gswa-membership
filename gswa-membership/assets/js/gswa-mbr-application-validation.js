@@ -27,13 +27,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const education = document.getElementById('mbr_education');
         const profession = document.getElementById('mbr_profession');
         const mobile = document.getElementById('mobile');
-        const email = document.getElementById('email');
+        //const email = document.getElementById('email');
         const declaration = document.getElementById('declaration');
 
         // 2. Validation patterns.
         const namePattern = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
-        const mobilePattern = /^\+[1-9]\d{1,14}$/;
-        const mobilePattern_domestic = '/^01[3-9]\d{8}$/';
+        
         const nidPattern = /^(?:\d{10}|\d{17})$/;
 
        /* if ( preg_match( '/^01[3-9]\d{8}$/', $mobile ) ) {
@@ -97,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 isValid = false;
             } else if (!namePattern.test(value)) {
                 fatherName.setCustomValidity(
-                    "Enter your father's name using the permitted characters."
+                    "Enter your father's name using English characters only."
                 );
                 isValid = false;
             }
@@ -114,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 isValid = false;
             } else if (!namePattern.test(value)) {
                 motherName.setCustomValidity(
-                    "Enter your mother's name using the permitted characters."
+                    "Enter your mother's name using  English characters only."
                 );
                 isValid = false;
             }
@@ -238,43 +237,7 @@ document.addEventListener('DOMContentLoaded', function () {
             isValid = false;
         }
 
-        // 16. Mobile number.
-// 16. Mobile/Telephone number.
-if (mobile) {
-    // Strip out spaces, hyphens, periods, and parentheses to sanitize input
-    const normalizedMobile = mobile.value.replace(/[\s\-().]/g, '');
-
-    if (!normalizedMobile) {
-        mobile.setCustomValidity('Phone number is required.');
-        isValid = false;
-    } else {
-        // Corrected Regex: Allows optional '+', followed by ANY digit (0-9), 
-        // with a total length between 7 and 15 digits.
-        const globalPhoneRegex = /^\+?[0-9]\d{6,14}$/;
-
-        if (!globalPhoneRegex.test(normalizedMobile)) {
-            mobile.setCustomValidity('Please enter a valid phone number.');
-            isValid = false;
-        } else {
-            mobile.setCustomValidity(''); 
-        }
-    }
-}
-
-        //Email validation
-        if (email) {
-            if (!email.value.trim()) {
-                email.setCustomValidity(
-                    'Email address is required.'
-                );
-                isValid = false;
-            } else if (!email.validity.valid) {
-                email.setCustomValidity(
-                    'Please enter a valid email address.'
-                );
-                isValid = false;
-            }
-        }
+        // 16 & 17 takeout mobile and email validation put into signup file
 
         // 18. Declaration.
         if (declaration && !declaration.checked) {
