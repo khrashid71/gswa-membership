@@ -209,11 +209,17 @@ error_log(
             <p>
                 <label for="gswa_email">Email</label><br>
                 <input type="email" id="gswa_email" name="gswa_email" required>
+                <span id="gswa-email-feedback"
+                    class="gswa-ajax-message"
+                    aria-live="polite"></span>
             </p>
             <p>
                 <!-- Added Mobileno-->
                 <label for="phone">Mobileno</label><br>
-                <input type="tel" id="phone" name="phone" required>
+                <input type="tel" id="phone" name="phone" maxlength="15" required>
+                <span id="gswa-mobile-feedback"
+                    class="gswa-ajax-message"
+                    aria-live="polite"></span>
             </p>
 
             <p>
@@ -231,7 +237,7 @@ error_log(
             </p>
 
         </form>
-
+       
     </div>
 
     <?php

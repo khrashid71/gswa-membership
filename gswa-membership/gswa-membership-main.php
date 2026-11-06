@@ -29,6 +29,9 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/helpers.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-central-enqueue.php';
 //creating  database table for membership
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-database.php';
+
+//php handlers 
+require_once plugin_dir_path( __FILE__ ). 'includes/gswa-ajax-checks.php';
 //Adding signup page
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-signup.php';
 //adding above code for auto email on signin page

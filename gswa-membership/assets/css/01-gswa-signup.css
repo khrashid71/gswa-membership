@@ -1,0 +1,17 @@
+.gswa-ajax-message {
+    display: block;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.gswa-ajax-message.success {
+    color: green;
+}
+
+.gswa-ajax-message.error {
+    color: red;
+}
+
+.gswa-ajax-message.checking {
+    color: #666;
+}

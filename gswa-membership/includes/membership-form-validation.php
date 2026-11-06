@@ -1,12 +1,20 @@
 <?php
 
 function gswa_validate_mobile( $mobile ) {
-    // 1. Sanitize input: Strip out spaces, hyphens, parentheses, and dots
-    $normalizedMobile = preg_replace('/[\s\-().]/', '', $mobile);
 
-    // 2. Validate: Allows optional '+', followed by ANY digit (0-9),
-    // with a total length between 7 and 15 digits.
-    if ( preg_match( '/^\+?[0-9]\d{6,14}$/', $normalizedMobile ) ) {
+    // 1. Remove surrounding whitespace.
+    $mobile = trim( $mobile );
+
+    // 2. Normalize common formatting characters.
+    $normalizedMobile = preg_replace( '/[\s\-().]/', '', $mobile );
+
+    // 3. Bangladesh domestic format.
+    if ( preg_match( '/^01[3-9]\d{8}$/', $normalizedMobile ) ) {
+        return true;
+    }
+
+    // 4. International format (E.164-style).
+    if ( preg_match( '/^\+[1-9]\d{1,14}$/', $normalizedMobile ) ) {
         return true;
     }
 
