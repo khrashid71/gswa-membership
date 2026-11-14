@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const eligibility = document.getElementById('eligibility');
         const upazila = document.getElementById('native_upazila');
         const memberType = document.getElementById('memberType');
-
+        
         const applicantName = document.getElementById('applicant_full_name');
         const fatherName = document.getElementById('father_full_name');
         const motherName = document.getElementById('mother_full_name');
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // 11. Blood group.
-        if (bloodGroup && bloodGroup.value.trim()) {
+       /* if (bloodGroup && bloodGroup.value.trim()) {
             const validBloodGroups = [
                 'A+', 'A-', 'B+', 'B-',
                 'AB+', 'AB-', 'O+', 'O-'
@@ -203,6 +203,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
                 
+        } */
+
+            //Blood Group -alternate dropdown list
+            if (bloodGroup && !bloodGroup.value) {
+            bloodGroup.setCustomValidity(
+                'Please select your Blood Group.'
+            );
+            isValid = false;
         }
 
         // 12. Present address.

@@ -1,19 +1,20 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
+//adding here
+/**
+ * Validate mobile number format.
+ */
 function gswa_validate_mobile( $mobile ) {
-
-    // 1. Remove surrounding whitespace.
     $mobile = trim( $mobile );
-
-    // 2. Normalize common formatting characters.
     $normalizedMobile = preg_replace( '/[\s\-().]/', '', $mobile );
 
-    // 3. Bangladesh domestic format.
     if ( preg_match( '/^01[3-9]\d{8}$/', $normalizedMobile ) ) {
         return true;
     }
 
-    // 4. International format (E.164-style).
     if ( preg_match( '/^\+[1-9]\d{1,14}$/', $normalizedMobile ) ) {
         return true;
     }
@@ -21,130 +22,192 @@ function gswa_validate_mobile( $mobile ) {
     return false;
 }
 
-function gswa_process_member_application() {
-    if ( ! isset( $_POST['gswa_application_submit'] ) ) {
+/**
+ * Main form processing logic.
+ */
+
+//add end here
+
+/**
+ * Process GSWA Membership Application Submissions securely mapping to custom schema.
+ */
+add_action( 'template_redirect', 'gswa_handle_member_application_submission' );
+
+function gswa_handle_member_application_submission() {
+    // Check if our unique application form is actively posted
+    if ( ! isset( $_POST['gswa_application_nonce'] ) || ! isset( $_POST['eligibility'] ) ) {
         return;
     }
- // 1. Require a logged-in WordPress user.
+
+    // Security check: Nonce Verification
+    if ( ! wp_verify_nonce( $_POST['gswa_application_nonce'], 'gswa_application_action' ) ) {
+        wp_die( __( 'Security evaluation failed. Please reload the page.', 'gswa-membership' ), __( 'Error', 'gswa-membership' ), array( 'response' => 403 ) );
+    }
+
+    // Authorization check: User must be authenticated
     if ( ! is_user_logged_in() ) {
-        wp_die( 'Please sign in before submitting your membership application.' );
+        wp_die( __( 'You must sign in before saving this application.', 'gswa-membership' ), __( 'Unauthorized', 'gswa-membership' ), array( 'response' => 401 ) );
     }
 
+    global $wpdb;
     $current_user = wp_get_current_user();
-    // Nonce verification
-    if ( ! isset( $_POST['gswa_application_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['gswa_application_nonce'] ) ), 'gswa_application_action' ) ) {
-        wp_die( 'Security verification failed. Please refresh the page and try again.' );
-    }
-    
-    // Sanitize dropdown lists
+    $errors       = array();
 
-    $eligibility    = sanitize_text_field( wp_unslash( $_POST['eligibility'] ?? '' ) );
-    $naitve_upazila = sanitize_text_field( wp_unslash( $_POST['native_upazila'] ?? '' ) );
-    $member_type    = sanitize_text_field( wp_unslash( $_POST['memberType'] ?? '' ) );
+    // 1. Sanitize and Collect All Schema Map Post Payloads
+    $eligibility       = sanitize_text_field( $_POST['eligibility'] ?? '' );
+    $native_upazila    = sanitize_text_field( $_POST['native_upazila'] ?? '' );
+    $member_type       = sanitize_text_field( $_POST['memberType'] ?? '' );
+    $full_name         = sanitize_text_field( $_POST['applicant_full_name'] ?? '' );
+    $father_name       = sanitize_text_field( $_POST['father_full_name'] ?? '' );
+    $mother_name       = sanitize_text_field( $_POST['mother_full_name'] ?? '' );
+    $dob               = sanitize_text_field( $_POST['birthday'] ?? '' );
+    $blood_group       = sanitize_text_field( $_POST['blood_group'] ?? null );
+    $raw_nid           = sanitize_text_field( $_POST['nid'] ?? '' );
+    $present_address   = sanitize_textarea_field( $_POST['presentAddress'] ?? '' );
+    $permanent_address = sanitize_textarea_field( $_POST['permanentAddress'] ?? '' );
+    $education         = sanitize_text_field( $_POST['mbr_education'] ?? '' );
+    $profession        = sanitize_text_field( $_POST['mbr_profession'] ?? '' );
+    $mobile_number     = sanitize_text_field( $_POST['mobile'] ?? '' );
+    $email             = sanitize_email( $_POST['email'] ?? '' );
+        
+    $declaration       = isset( $_POST['declaration'] ) ? 1 : 0;
 
-    
-    // Sanitize input text fields
-    $applicant_name = sanitize_text_field( $_POST['applicant_full_name'] ?? '' );
-    $father_name    = sanitize_text_field( $_POST['father_full_name'] ?? '' );
-    $mother_name    = sanitize_text_field( $_POST['mother_full_name'] ?? '' );
-    $date_of_birth  = sanitize_text_field( $_POST['birthday'] ?? '' );
-    $national_id    = sanitize_text_field( $_POST['nid'] ?? '' );
-    $blood_group    = sanitize_text_field( $_POST['blood_group'] ?? '' );
-    //$email          = sanitize_text_field( $_POST['email'] ?? '' );
-     $email = sanitize_email(wp_unslash( $_POST['email'] ?? '' )
+    // 2. Validate Schema Integrity Constraints (NOT NULL fields)
+    $required_fields = array(
+        'Eligibility'         => $eligibility,
+        'Native Upazila'      => $native_upazila,
+        'Membership Type'         => $member_type,
+        'Applicant Full Name' => $full_name,
+        'Father Full Name'    => $father_name,
+        'Mother Full Name'    => $mother_name,
+        'Date of Birth'       => $dob,
+        'National ID (NID) Number'=>$raw_nid,
+        //'Passport Size Photo' =>
+        'presentAddress'      => $present_address,
+        'permanentAddress'    => $permanent_address,
+        'mbr_education'       => $education,
+        'mb_profession'       => $profession,
+        'mobile_number'       => $mobile_number,
+        'email'               => $email,
     );
-    
-    $mobile = '';
-    if ( isset( $_POST['mobile'] ) && is_string( $_POST['mobile'] ) ) {
-        $mobile = sanitize_text_field( wp_unslash( $_POST['mobile'] ) );
+
+    foreach ( $required_fields as $field_key => $value ) {
+        if ( empty( $value ) ) {
+            $errors[] = sprintf( __( 'The field "%s" is required.', 'gswa-membership' ), ucwords( str_replace( '_', ' ', $field_key ) ) );
+        }
     }
 
-    // Validations
-    if ( empty( $applicant_name ) || empty( $father_name ) || empty( $mother_name ) || empty( $mobile ) || empty( $email ) ) {
-        wp_die( 'Please complete all required fields.' );
-    }
-
-    if ( ! preg_match( "/^[A-Za-z\s'-]+$/", $applicant_name ) ) {
-        wp_die( 'Applicant Name must contain English letters only.' );
-    }
-    if ( ! preg_match( "/^[A-Za-z\s'-]+$/", $father_name ) ) {
-        wp_die( 'Father Name must contain English letters only.' );
-    }
-    if ( ! preg_match( "/^[A-Za-z\s'-]+$/", $mother_name ) ) {
-        wp_die( 'Mother Name must contain English letters only.' );
-    }
     if ( ! is_email( $email ) ) {
-        wp_die( 'Please enter a valid email address.' );
+        $errors[] = __( 'Please enter a valid email address.', 'gswa-membership' );
     }
+
+    if ( 0 === $declaration ) {
+        $errors[] = __( 'You must accept the declaration rules to submit your request.', 'gswa-membership' );
+    }
+
+    // 3. Cryptographic Validation via NID Helpers
+    $normalized_nid = gswa_normalize_nid( $raw_nid );
+    
   
-    
-        if ( ! gswa_validate_mobile( $mobile ) ) {
-        wp_die( 'Please enter a valid Bangladesh domestic or international mobile number.' );
+// Check duplicate NID registration entries using fingerprint lookup helper
+   if ( ! $normalized_nid ) {
+        $errors[] = __( 'Invalid National ID format. Use digits only.', 'gswa-membership' );
     }
-    
-    if ( ! preg_match( '/^(?:[0-9]{10}|[0-9]{17})$/', $national_id ) ) {
-    wp_die( 'Please enter a valid 10-digit or 17-digit NID number.' );
-}
-    // ==================== PHP File Validation ====================
-    $allowed_exts = array( 'jpg', 'jpeg', 'png', 'webp' );
-    
-    // 1. Check NID Photo Upload - for future release
-    /*if ( ! isset( $_FILES['nid_photo'] ) || $_FILES['nid_photo']['error'] !== UPLOAD_ERR_OK ) {
-        wp_die( 'NID photo is required and must be uploaded without errors.' );
-    }
-    $nid_file = $_FILES['nid_photo'];
-    $nid_ext  = strtolower( pathinfo( $nid_file['name'], PATHINFO_EXTENSION ) );
-    
-    if ( ! in_array( $nid_ext, $allowed_exts, true ) ) {
-        wp_die( 'Invalid NID photo format. Allowed formats: JPG, JPEG, PNG, and WebP.' );
-    }
-    if ( $nid_file['size'] < ( 100 * 1024 ) || $nid_file['size'] > ( 500 * 1024 ) ) {
-        wp_die( 'NID photo size must be between 100 KB and 500 KB.' );
-    }*/
-
-    // 2. Check member Photo Upload
-    if ( ! isset( $_FILES['pp_photo'] ) || $_FILES['pp_photo']['error'] !== UPLOAD_ERR_OK ) {
-        wp_die( 'Member photo is required and must be uploaded without errors.' );
-    }
-    $pp_file = $_FILES['pp_photo'];
-    $pp_ext  = strtolower( pathinfo( $pp_file['name'], PATHINFO_EXTENSION ) );
-    
-    if ( ! in_array( $pp_ext, $allowed_exts, true ) ) {
-        wp_die( 'Invalid Member photo format. Allowed formats: JPG, JPEG, PNG, and WebP.' );
-    }
-    if ( $pp_file['size'] < ( 20 * 1024 ) || $pp_file['size'] > ( 300 * 1024 ) ) {
-        wp_die( 'Member photo size must be between 20 KB and 300 KB.' );
+    $nid_check = gswa_nid_exists( $normalized_nid );
+    if ( is_wp_error( $nid_check ) ) {
+        wp_die( esc_html( $nid_check->get_error_message() ) );
+    } elseif ( true === $nid_check ) {
+        wp_die( 'An application with this National ID has already been submitted.' );
     }
 
-    // ==================== Handle Uploads securely using WordPress APIs ====================
-    if ( ! function_exists( 'wp_handle_upload' ) ) {
+    
+
+    // 4. Fallback execution on failed validations
+    if ( ! empty( $errors ) ) {
+        set_transient( 'gswa_form_errors_' . $current_user->ID, $errors, 45 );
+        return;
+    }
+
+    // 5. Encrypt Sensitive Security Values
+    $nid_encrypted   = gswa_encrypt_nid( $normalized_nid );
+    $nid_fingerprint = gswa_nid_fingerprint( $normalized_nid );
+
+    if ( ! $nid_encrypted || ! $nid_fingerprint ) {
+        gswa_membership_log( 'Security system encryption failure for user ID: ' . $current_user->ID );
+        set_transient( 'gswa_form_errors_' . $current_user->ID, array( __( 'Cryptographic initialization failed.', 'gswa-membership' ) ), 45 );
+        return;
+    }
+
+    // 6. Handle Passport Photo Upload File Streams safely via WordPress core
+    $passport_photo_path = null;
+    if ( ! empty( $_FILES['pp_photo']['name'] ) ) {
         require_once ABSPATH . 'wp-admin/includes/file.php';
+        
+        $override   = array( 'test_form' => false );
+        $file_array = $_FILES['pp_photo'];
+        
+        // Match standard profile image mime boundaries
+        $uploaded_file = wp_handle_upload( $file_array, $override );
+
+        if ( isset( $uploaded_file['error'] ) ) {
+            set_transient( 'gswa_form_errors_' . $current_user->ID, array( __( 'Photo Upload Error: ', 'gswa-membership' ) . $uploaded_file['error'] ), 45 );
+            return;
+        } else {
+            $passport_photo_path = $uploaded_file['url']; // Saves relative system URL or system absolute directory
+        }
     }
 
-    // These overrides allow us to bypass standard dashboard forms checks
-    $upload_overrides = array( 'test_form' => false );
+    // 7. Auto-Generate Custom Unique Tracking ID Number
+    $timestamp          = time();
+    $rand_suffix        = mt_rand( 1000, 9999 );
+    $application_number = 'GSWA-' . strtoupper( substr( $member_type, 0, 2 ) ) . '-' . $timestamp . '-' . $rand_suffix;
 
-    // Process NID upload
-    /*$nid_upload_result = wp_handle_upload( $nid_file, $upload_overrides );
-    if ( isset( $nid_upload_result['error'] ) ) {
-        wp_die( 'Error uploading NID photo: ' . esc_html( $nid_upload_result['error'] ) );
-    }*/
+    // 8. DB Execute Query Map Object Array
+    $table_name = $wpdb->prefix . 'gswa_applications';
+    $mysql_now  = current_time( 'mysql' );
 
-    // Process Member Photo upload
-    $pp_upload_result = wp_handle_upload( $pp_file, $upload_overrides );
-    if ( isset( $pp_upload_result['error'] ) ) {
-        wp_die( 'Error uploading member photo: ' . esc_html( $pp_upload_result['error'] ) );
+    $insert_data = array(
+        'application_number'   => $application_number,
+        'user_id'              => $current_user->ID,
+        'eligibility'          => $eligibility,
+        'native_upazila'       => $native_upazila,
+        'member_type'          => $member_type,
+        'applicant_full_name'  => $full_name,
+        'father_full_name'     => $father_name,
+        'mother_full_name'     => $mother_name,
+        'date_of_birth'        => $dob,
+        'blood_group'          => $blood_group,
+        'present_address'      => $present_address,
+        'permanent_address'    => $permanent_address,
+        'education'            => $education,
+        'profession'           => $profession,
+        'mobile_number'        => $mobile_number,
+        'email'                => $email,
+        'passport_photo_path'  => $passport_photo_path,
+        'declaration_accepted' => $declaration,
+        'application_status'   => 'pending',
+        'submitted_at'         => $mysql_now,
+        'updated_at'           => $mysql_now,
+        'nid_encrypted'        => $nid_encrypted,
+        'nid_fingerprint'      => $nid_fingerprint,
+    );
+
+    $insert_format = array(
+        '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s',
+        '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s',
+        '%s', '%s', '%s'
+    );
+
+    $inserted = $wpdb->insert( $table_name, $insert_data, $insert_format );
+
+    if ( false === $inserted ) {
+        gswa_membership_log( 'Database writing failure tracking log errors: ' . $wpdb->last_error );
+        set_transient( 'gswa_form_errors_' . $current_user->ID, array( __( 'A database writing event error aborted your execution process.', 'gswa-membership' ) ), 45 );
+        return;
     }
 
-    // Successfully uploaded file URLs are now accessible here:
-    //$nid_photo_url = $nid_upload_result['url']; 
-    $pp_photo_url  = $pp_upload_result['url'];
-
-    // Debugging logs to verify paths
-    //error_log( 'NID Saved At: ' . $nid_photo_url );
-    error_log( 'Member Photo Saved At: ' . $pp_photo_url );
-
-    // Your data persistence logic (e.g. wp_insert_post or custom DB inserts) goes here
+    // 9. Redirect Safely to prevent double POST processing issues on page refreshes
+    set_transient( 'gswa_form_success_' . $current_user->ID, sprintf( __( 'Application submitted! Your tracking ID is: %s', 'gswa-membership' ), $application_number ), 45 );
+    wp_safe_redirect( add_query_arg( 'status', 'success', wp_get_referer() ) );
+    exit;
 }
-add_action( 'init', 'gswa_process_member_application' );
-?>

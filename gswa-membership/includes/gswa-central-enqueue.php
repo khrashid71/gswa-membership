@@ -9,12 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 function gswa_membership_enqueue_assets() {
-
+    //plugin Base URL
+    $plugin_url = plugin_dir_url( __DIR__ );
+    //Alternative
+     //$plugin_url = plugin_dir_url(dirname( __FILE__ )); 
     // Signup page
     if ( is_page( 'sign-up-3' ) ) {
-         $plugin_url = plugin_dir_url( __DIR__ ); 
-          //same (dirname( __FILE__ ));
-         //$plugin_url = plugin_dir_url(dirname( __FILE__ )); 
+         //$plugin_url = plugin_dir_url( __DIR__ ); 
+           
        //Ajax
         wp_enqueue_script(
             'gswa-signup-ajax',
@@ -26,12 +28,15 @@ function gswa_membership_enqueue_assets() {
 
         //Adding css for gswa-signup page
          wp_enqueue_style(
+           
             'gswa-signup-style',
             $plugin_url . 'assets/css/01-gswa-signup.css',
             array(),
             '1.0.0',
             
          );
+
+         
 
 
         // Pass AJAX URL and nonce to JavaScript.
@@ -46,7 +51,8 @@ function gswa_membership_enqueue_assets() {
           // JavaScript file
         wp_enqueue_script(
             'gswa-signup',
-            plugin_dir_url( __DIR__  ) . 'assets/js/gswa-signup.js',
+             plugin_dir_url( __DIR__  ) . 'assets/js/gswa-signup.js',
+           
             array(),
             '1.0.1',
             true
@@ -55,12 +61,25 @@ function gswa_membership_enqueue_assets() {
 
     }
 
-    // Membership application page
-    if ( is_page( 'membership-application' ) ) {
-           $plugin_url = plugin_dir_url( __DIR__ ); 
+    
+    //Adding css for gswa-membership-form page
+         wp_enqueue_style(
+           
+            'gswa-membership-application-style',
+            $plugin_url . 'assets/css/03-gswa-mbr-application-form.css',
+            array(),
+            '1.0.0',
+            
+         );
+
+    // Membership application page with js validation
+    if ( is_page( 'member-application' ) ) {
+           //$plugin_url = plugin_dir_url( __DIR__ ); 
+          
         wp_enqueue_script(
             'gswa-application-validation',
            $plugin_url . 'assets/js/gswa-mbr-application-validation.js',
+           
             array(),
             '1.0.0',
             true
