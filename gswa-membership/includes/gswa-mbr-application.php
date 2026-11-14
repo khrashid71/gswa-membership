@@ -148,6 +148,11 @@ function gswa_member_application_form() {
             maxlength="17"
             placeholder="Enter your 10 or 17 digit NID number"
             required>
+            <span
+            id="gswa-nid-feedback"
+            class="gswa-ajax-message"
+            aria-live="polite">
+            </span>
         <!-- NID Image: 100 KB–500 KB -->
         <!--<label for="nid_photo">Upload NID photo:</label>
         <input type="file" id="nid_photo" name="nid_photo" accept=".jpg,.jpeg,.png,.webp" required>-->

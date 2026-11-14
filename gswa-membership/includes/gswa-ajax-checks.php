@@ -122,3 +122,84 @@ function gswa_ajax_check_mobile() {
         )
     );
 }
+
+
+/**
+ * GSWA AJAX: Check NID availability.
+ */
+
+// Register AJAX action for logged-in users.
+add_action(
+    'wp_ajax_gswa_check_nid',
+    'gswa_ajax_check_nid'
+);
+
+
+function gswa_ajax_check_nid() {
+
+    // 1. Verify AJAX nonce.
+    if (
+        ! isset( $_POST['nonce'] ) ||
+        ! wp_verify_nonce(
+            sanitize_text_field( wp_unslash( $_POST['nonce'] ) ),
+            'gswa_ajax_nonce'
+        )
+    ) {
+        wp_send_json_error(
+            array( 'message' => 'Security verification failed.' )
+        );
+    }
+
+    // 2. Check NID input.
+    if ( ! isset( $_POST['nid'] ) ) {
+
+        wp_send_json_error(
+            array( 'message' => 'NID number is required.' )
+        );
+    }
+
+    $raw_nid = sanitize_text_field(
+        wp_unslash( $_POST['nid'] )
+    );
+
+    // 3. Normalize NID.
+    $normalized_nid = gswa_normalize_nid( $raw_nid );
+
+    if ( ! $normalized_nid ) {
+
+        wp_send_json_error(
+            array( 'message' => 'Invalid NID format. Enter 10 or 17 digits.' )
+        );
+    }
+
+    // 4. Generate NID fingerprint.
+    $nid_fingerprint = gswa_nid_fingerprint( $normalized_nid );
+
+    if ( ! $nid_fingerprint ) {
+
+        wp_send_json_error(
+            array( 'message' => 'Unable to verify NID.' )
+        );
+    }
+
+    // 5. Check NID fingerprint in application table.
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . 'gswa_applications';
+
+    $exists = $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT 1 FROM {$table_name}
+             WHERE nid_fingerprint = %s
+             LIMIT 1",
+            $nid_fingerprint
+        )
+    );
+
+    // 6. Return AJAX response.
+    wp_send_json_success(
+        array(
+            'exists' => (bool) $exists
+        )
+    );
+}

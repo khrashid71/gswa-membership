@@ -17,7 +17,7 @@ function gswa_membership_enqueue_assets() {
     if ( is_page( 'sign-up-3' ) ) {
          //$plugin_url = plugin_dir_url( __DIR__ ); 
            
-       //Ajax
+       //Ajax for email and mobile
         wp_enqueue_script(
             'gswa-signup-ajax',
            $plugin_url . 'assets/js/gswa-signup-ajax.js',
@@ -26,6 +26,7 @@ function gswa_membership_enqueue_assets() {
             true
         );
 
+        
         //Adding css for gswa-signup page
          wp_enqueue_style(
            
@@ -84,7 +85,26 @@ function gswa_membership_enqueue_assets() {
             '1.0.0',
             true
         );
-    }
+
+        // NID AJAX validation.
+    wp_enqueue_script(
+        'gswa-nid-ajax',
+        $plugin_url . 'assets/js/gswa-nid-ajax.js',
+        array(),
+        '1.0.0',
+        true
+    );
+
+    // Pass AJAX URL and nonce to NID JavaScript.
+    wp_localize_script(
+        'gswa-nid-ajax',
+        'gswaNidAjax',
+        array(
+            'ajax_url' => admin_url( 'admin-ajax.php' ),
+            'nonce'    => wp_create_nonce( 'gswa_ajax_nonce' ),
+        )
+    );
+ }
 
 }
 
