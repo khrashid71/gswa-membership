@@ -49,6 +49,11 @@ function gswa_handle_member_application_submission() {
         wp_die( __( 'You must sign in before saving this application.', 'gswa-membership' ), __( 'Unauthorized', 'gswa-membership' ), array( 'response' => 401 ) );
     }
 
+    //testing adding here
+   
+
+    //end adding submission msg code
+
     global $wpdb;
     $current_user = wp_get_current_user();
     $errors       = array();
@@ -206,8 +211,35 @@ function gswa_handle_member_application_submission() {
         return;
     }
 
-    // 9. Redirect Safely to prevent double POST processing issues on page refreshes
-    set_transient( 'gswa_form_success_' . $current_user->ID, sprintf( __( 'Application submitted! Your tracking ID is: %s', 'gswa-membership' ), $application_number ), 45 );
-    wp_safe_redirect( add_query_arg( 'status', 'success', wp_get_referer() ) );
-    exit;
+    
+     
+    // 9. Store success message.
+set_transient(
+    'gswa_form_success_' . $current_user->ID,
+    sprintf(
+        __( 'Application submitted! Your tracking ID is: %s', 'gswa-membership' ),
+        $application_number
+    ),
+    45
+);
+
+// 10. Redirect to Payment Management page.
+$payment_page = get_page_by_path( 'payment-management' );
+
+if ( $payment_page ) {
+
+    $redirect_url = add_query_arg(
+        'status',
+        'success',
+        get_permalink( $payment_page->ID )
+    );
+
+} else {
+
+    // Fallback URL.
+    $redirect_url = home_url( '/payment-management/' );
+}
+
+wp_safe_redirect( $redirect_url, 303 );
+exit;
 }

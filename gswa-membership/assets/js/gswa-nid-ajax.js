@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             showMessage(
                 nidMessage,
-                nid ? 'Enter a valid 10 or 17 digit NID.' : '',
+                nid ? 'Invalid no-Enter a valid 10 or 17 digit NID.' : '',
                 nid ? 'error' : ''
             );
 

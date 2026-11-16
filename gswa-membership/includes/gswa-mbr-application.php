@@ -22,6 +22,8 @@ function gswa_member_application_form() {
             return '<p>Please sign in before submitting your application.</p>';
         }
       ob_start(); // moved here
+
+         
         // Retrieve logged-in WordPress user.
         $current_user = wp_get_current_user();
 
@@ -263,9 +265,28 @@ function gswa_member_application_form() {
     </div>
 
        <div class="form-group">
-            <input type="submit"
+            <!--<input type="submit"
                    name="gswa_application_submit"
-                   value="Submit Application">
+                   value="Submit Application">-->
+                   <?php if ( $existing_application ) : ?>
+
+                <p class="gswa-message error">
+                    You have already submitted your membership application.
+                </p>
+
+                <input type="submit"
+                    name="gswa_application_submit"
+                    value="Application Already Submitted"
+                    disabled>
+
+            <?php else : ?>
+
+                <input type="submit"
+                    name="gswa_application_submit"
+                    value="Submit Application">
+
+            <?php endif; ?>
+
 </div>
 
     </form>
