@@ -37,6 +37,9 @@ function gswa_membership_enqueue_assets() {
             
          );
 
+        
+       
+
          
 
 
@@ -72,6 +75,14 @@ function gswa_membership_enqueue_assets() {
             '1.0.0',
             
          );
+
+          // CSS for GSWA Application Confirmation page.
+        wp_enqueue_style(
+            'gswa-application-confirmation-style',
+            $plugin_url . 'assets/css/04-gswa-application-confirmation.css',
+            array(),
+            '1.0.0'
+        );
 
     // Membership application page with js validation
     if ( is_page( 'member-application' ) ) {

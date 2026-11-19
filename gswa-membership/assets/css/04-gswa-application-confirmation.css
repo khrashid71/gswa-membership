@@ -1,0 +1,117 @@
+/* GSWA Application Confirmation */
+
+.gswa-confirmation-wrapper {
+    max-width: 760px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.gswa-confirmation-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 35px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.gswa-confirmation-icon {
+    width: 65px;
+    height: 65px;
+    line-height: 65px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: #198754;
+    color: #ffffff;
+    font-size: 35px;
+    font-weight: bold;
+}
+
+.gswa-confirmation-card h2 {
+    color: #198754;
+    font-size: 27px;
+    margin-bottom: 15px;
+}
+
+.gswa-confirmation-subtitle {
+    color: #555;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.gswa-success-message {
+    background: #eaf7ee;
+    border: 1px solid #b7dfc3;
+    border-radius: 7px;
+    padding: 15px;
+    margin: 25px 0;
+    color: #155724;
+    font-weight: 600;
+}
+
+.gswa-application-info {
+    background: #f5f8fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 25px 0;
+    text-align: left;
+}
+
+.gswa-application-info h3 {
+    color: #075B73;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.gswa-application-info p {
+    line-height: 1.7;
+    color: #444;
+}
+
+.gswa-pending-label {
+    display: inline-block;
+    background: #fff3cd;
+    color: #856404;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.gswa-free-registration {
+    color: #198754 !important;
+    font-weight: 700;
+}
+
+.gswa-home-button {
+    display: inline-block;
+    background: #075B73;
+    color: #ffffff !important;
+    padding: 12px 25px;
+    border-radius: 6px;
+    text-decoration: none !important;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+.gswa-home-button:hover {
+    background: #06445A;
+}
+
+.gswa-confirmation-footer {
+    margin-top: 30px;
+    color: #777;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+@media (max-width: 600px) {
+
+    .gswa-confirmation-card {
+        padding: 22px 16px;
+    }
+
+    .gswa-confirmation-card h2 {
+        font-size: 22px;
+    }
+
+}

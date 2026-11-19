@@ -193,20 +193,51 @@ if ( empty( $login_identifier ) || empty( $password ) ) {
         } else {
 
             /*
-             * Sign In successful.
-             * Redirect to GSWA Member Application.
-             */
+        * Sign In successful.
+        * Determine whether the user has already
+        * submitted a membership application.
+        */
+
+        global $wpdb;
+
+        $applications_table = $wpdb->prefix . 'gswa_applications';
+
+        $user_application = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT application_id
+                FROM {$applications_table}
+                WHERE user_id = %d
+                LIMIT 1",
+                $authenticated_user->ID
+            )
+        );
+
+        /*
+        * Redirect based on application existence.
+        */
+
+        if ( $user_application ) {
+
+            // Existing applicant.
+            wp_safe_redirect(
+                home_url( '/application-status/' )
+            );
+
+        } else {
+
+            // New applicant.
             wp_safe_redirect(
                 home_url( '/member-application/' )
             );
+        }
 
-            exit;
-        } // Close Sign In Successful
-    } //Close authenticated_user = wp_signon
- } //Close Determine whether the identifier is an email
-   //or a mobile number.
+        exit;
+                } // Close Sign In Successful
+            } //Close authenticated_user = wp_signon
+        } //Close Determine whether the identifier is an email
+        //or a mobile number.
 
-} //Close POST SERVER REQUEST_METHOD
+    } //Close POST SERVER REQUEST_METHOD
     ?>
 
     <div class="gswa-membership-signin">

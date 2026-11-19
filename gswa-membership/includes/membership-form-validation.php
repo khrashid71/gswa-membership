@@ -81,7 +81,7 @@ function gswa_handle_member_application_submission() {
     $required_fields = array(
         'Eligibility'         => $eligibility,
         'Native Upazila'      => $native_upazila,
-        'Membership Type'         => $member_type,
+        'Membership Type'     => $member_type,
         'Applicant Full Name' => $full_name,
         'Father Full Name'    => $father_name,
         'Mother Full Name'    => $mother_name,
@@ -223,8 +223,8 @@ set_transient(
     45
 );
 
-// 10. Redirect to Payment Management page.
-$payment_page = get_page_by_path( 'payment-management' );
+// 10. Redirect to Payment Management page.- R2.1 or Later
+/*$payment_page = get_page_by_path( 'payment-management' );
 
 if ( $payment_page ) {
 
@@ -238,6 +238,26 @@ if ( $payment_page ) {
 
     // Fallback URL.
     $redirect_url = home_url( '/payment-management/' );
+}
+
+wp_safe_redirect( $redirect_url, 303 );
+exit;*/
+
+//11. Confirmation page redirect after successfully submit the form
+$confirm_page = get_page_by_path( 'confirmation-page' );
+
+if ( $confirm_page ) {
+
+    $redirect_url = add_query_arg(
+        'status',
+        'success',
+        get_permalink( $confirm_page->ID )
+    );
+
+} else {
+
+    // Fallback URL.
+    $redirect_url = home_url( '/confirm_page/' );
 }
 
 wp_safe_redirect( $redirect_url, 303 );

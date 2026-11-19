@@ -45,8 +45,10 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-mbr-application.php';
 //membership form validation
 require_once plugin_dir_path( __FILE__ ). 'includes/membership-form-validation.php';
 //gswa payment management
-require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-payment-management.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-application-confirmation.php';
 
+//gswa application status
+require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-application-status.php';
 
 add_action( 'admin_menu', 'gswa_membership_admin_menu' );
 

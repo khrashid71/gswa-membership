@@ -5,6 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
+
 /**
  * Shortcode: [gswa_member_application]
  */
@@ -63,12 +64,12 @@ function gswa_member_application_form() {
         <label for="native_upazila">Native Upazila:</label>
         <select id="native_upazila" name="native_upazila" required>
             <option value="" disabled selected>Select native upazila</option>
-            <option value="gopalganj">Gopalganj Sadar</option>
-            <option value="muksudpur">Muksudpur</option>
-            <option value="kashiani">Kashiani</option>
-            <option value="kotalipara">Kotalipara</option>
-            <option value="tungipara">Tungipara</option>
-            <option value="other">Other - can apply DM or VM</option>
+            <option value="Gopalganj Sadar">Gopalganj Sadar</option>
+            <option value="Muksudpur">Muksudpur</option>
+            <option value="Kashiani">Kashiani</option>
+            <option value="Kotalipara">Kotalipara</option>
+            <option value="Tungipara">Tungipara</option>
+            <option value="Other">Other - can apply DM or VM</option>
             
         </select>
     </div>
@@ -77,12 +78,12 @@ function gswa_member_application_form() {
     <label for="memberType"> Membership Type:</label>
         <select id="memberType" name="memberType" required>
             <option value="" disabled selected>Select type</option>
-            <option value="donor">Donor Member(DM)</option>
-            <option value="life_central">Life Member(LM)-Central</option>
-            <option value="general_central">General Member(GM)-Central</option>
-            <option value="life_upazila">Life Member(LM)-Upazila</option>
-            <option value="general_upazila">General Member(GM)-Upazila</option>
-            <option value="volunteer">Volunteer Member(VM)</option>
+            <option value="Donor Member">Donor Member(DM)</option>
+            <option value="Life Member(LM)-Central">Life Member(LM)-Central</option>
+            <option value="General Member(GM)-Central">General Member(GM)-Central</option>
+            <option value="Life Member(LM)-Upazila">Life Member(LM)-Upazila</option>
+            <option value="General Member(GM)-Upazila">General Member(GM)-Upazila</option>
+            <option value="Volunteer Member(VM)">Volunteer Member(VM)</option>
         </select>
            
 </div>
@@ -121,7 +122,7 @@ function gswa_member_application_form() {
        </div>
 
         <div class="form-group">
-            <!--<label for="mother_full_name">Mother's Name</label><br>-->
+          
             <label for="mother_full_name">Mother Full Name: <span class="required">*</span></label>
             <input type="text"
                   id="mother_full_name"
@@ -264,28 +265,28 @@ function gswa_member_application_form() {
         </label>
     </div>
 
-       <div class="form-group">
-            <!--<input type="submit"
-                   name="gswa_application_submit"
-                   value="Submit Application">-->
-                   <?php if ( $existing_application ) : ?>
 
-                <p class="gswa-message error">
-                    You have already submitted your membership application.
-                </p>
+    <div class="form-group">
+           <?php if ( $existing_application ) : ?>
 
-                <input type="submit"
-                    name="gswa_application_submit"
-                    value="Application Already Submitted"
-                    disabled>
+    <p class="gswa-message success">
+        You have already submitted your membership application.
+    </p>
 
-            <?php else : ?>
+    <a href="<?php echo esc_url( home_url( '/application-status/' ) ); ?>"
+       class="gswa-status-button">
+        View Application Status
+    </a>
 
-                <input type="submit"
-                    name="gswa_application_submit"
-                    value="Submit Application">
+<?php else : ?>
 
-            <?php endif; ?>
+    <input type="submit"
+        name="gswa_application_submit"
+        value="Submit Application">
+
+<?php endif; ?>
+
+    
 
 </div>
 
