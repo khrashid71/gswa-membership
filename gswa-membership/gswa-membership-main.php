@@ -32,6 +32,7 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-database.php';
 
 //php handlers 
 require_once plugin_dir_path( __FILE__ ). 'includes/gswa-ajax-checks.php';
+
 //Adding signup page
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-signup.php';
 //adding above code for auto email on signin page
@@ -47,10 +48,18 @@ require_once plugin_dir_path( __FILE__ ). 'includes/membership-form-validation.p
 //gswa payment management
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-application-confirmation.php';
 
+
 //gswa application status
 require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-application-status.php';
 
-add_action( 'admin_menu', 'gswa_membership_admin_menu' );
+//Adding Executive Committee - Administrations
+require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-executive-accounts.php';
+
+// Add New Executive
+require_once plugin_dir_path( __FILE__ ) . 'includes/gswa-add-new-executive.php';
+
+
+add_action( 'admin_menu', 'gswa_membership_admin_menu' );// default priority is 10 here
 
 function gswa_membership_admin_menu() {
 
